@@ -1,0 +1,48 @@
+{
+  "info":{ 
+    "name": "Sample Name"
+  },
+  "entities":{
+    "bowl":{
+      "spawnSpeed": -200
+    }
+  },
+  "level":{
+    "values":{
+      "spawn_width": "100"
+    },
+    "platforms":[
+      {
+        "x": "110",
+        "y": "150",
+        "width": "750",
+        "height": "50"
+      },
+      {
+        "x": "110",
+        "y": "285",
+        "width": "750",
+        "height": "50"
+      },
+      {
+        "x": "110",
+        "y": "420",
+        "width": "750",
+        "height": "50"
+      },
+      {
+        "x": "0",
+        "y": "550",
+        "width": "980",
+        "height": "50"
+      },
+      {
+        "x": "0",
+        "y": "680",
+        "width": "980",
+        "height": "50"
+      }
+    ]
+  }
+
+}

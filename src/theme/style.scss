@@ -1,0 +1,106 @@
+
+/* Resets, etc */
+@import './theme.scss';
+
+/* Color palette */
+@import './colors.scss';
+
+
+h1, h2, h3, h4{
+  font-family: $font-rocksalt;
+}
+
+h1{
+  font-size:4rem;
+}
+h2{
+  font-size:3rem;
+}
+h3{
+  font-size:2.6rem;
+}
+
+$value_gameTop: 150px;
+
+body{
+  position:absolute;
+  left:0;
+  top:0;
+  right:0;
+  bottom:0;
+  margin:0;
+  font-family: 'Roboto', cursive;
+  font-weight: 500;
+  font-size: 1.8rem;
+
+  background-color: $color_grey;
+  color: $color_green;
+}
+
+#header{
+  height:$value_gameTop;
+
+  padding: 5px;
+  // box-shadow: 4px 4px 5px $color_black;
+
+  display:flex;
+  align-items:center;
+}
+
+#game-container{
+  position:absolute;
+  top:$value_gameTop;
+  height:calc(100% - #{$value_gameTop});
+  width:100%;
+
+  overflow:auto;
+
+  >canvas{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+$shadow_tab: 5px 0px 5px -4px $color_black;
+
+.header-left{
+  box-shadow: $shadow_tab;
+  border-radius: 20px;
+  padding:0px 80px 0px 10px;
+
+  height:100%;
+}
+.header-right{
+  flex:1;
+  height:100%;
+  text-align:right;
+
+  >*{
+    display:inline-block;
+    width:49%;
+    vertical-align:top;
+
+    padding:5px;
+    height:100%;
+
+    color: $color_grey_light;
+
+    border-top: 3px solid $color_grey;
+    border-bottom: 3px solid $color_grey;
+    box-shadow: $shadow_tab;
+    border-radius: 20px;
+    padding-right:10px;
+    
+    h4{
+      margin-top:-10px;
+    }
+  }
+}
+
+.description{
+  text-align:right;
+  color: $color_grey_light;
+  font-size:14px;
+}
