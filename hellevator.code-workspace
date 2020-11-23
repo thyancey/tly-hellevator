@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "..\\..\\raccoon-trapper\\tly-raccoon-trapper"
 		}
 	],
 	"settings": {}

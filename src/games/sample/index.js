@@ -66,6 +66,7 @@ function create() {
 }
 
 function update (){
+  SpawnController.update();
 }
 
 const onKeyDown = (e) => {
