@@ -39,6 +39,7 @@ class Entity extends Phaser.Physics.Arcade.Sprite {
     
     // this.body.setSize(36,15);
     // this.body.offset.y = -2;
+    this.alpha = .5;
 
     this.setStatus(STATUS.CLOSED, true);
   }

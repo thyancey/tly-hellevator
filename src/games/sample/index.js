@@ -69,9 +69,34 @@ function update (){
   SpawnController.update();
 }
 
+function queueElevator(floor, direction){
+  SpawnController.queueElevator(floor, direction);
+}
+
 const onKeyDown = (e) => {
+  console.log(e.code);
   switch(e.code){
     case 'Space': SpawnController.spawnSample();
+      break;
+    case 'Digit0': queueElevator(0, -1);
+      break;
+    case 'Digit1': queueElevator(1, -1);
+      break;
+    case 'Digit2': queueElevator(2, -1);
+      break;
+    case 'Digit3': queueElevator(3, -1);
+      break;
+    case 'Digit4': queueElevator(4, -1);
+      break;
+    case 'Numpad0': queueElevator(0, 1);
+      break;
+    case 'Numpad1': queueElevator(1, 1);
+      break;
+    case 'Numpad2': queueElevator(2, 1);
+      break;
+    case 'Numpad3': queueElevator(3, 1);
+      break;
+    case 'Numpad4': queueElevator(4, 1);
       break;
   }
 }
