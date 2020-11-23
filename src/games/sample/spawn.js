@@ -12,6 +12,8 @@ const elevators = [];
 let commandQueue = [];
 let sceneContext;
 let floorPositions = [];
+const DOOR_OFFSET = 295;
+const DOOR_SPACING = 357;
 
 export const setContext = (context) => {
   sceneContext = context;
@@ -160,7 +162,7 @@ const spawnDoors = fPs => {
 export const spawnSign = (doorIdx, floorIdx) => {
   
   let entity = new ElevatorSign.Entity(sceneContext, groups.sample1, {
-    x: 350 + (doorIdx * 300),
+    x: DOOR_OFFSET + (doorIdx * DOOR_SPACING),
     y: floorPositions[floorIdx].y - 35,
     depth: 1
   });
@@ -171,7 +173,7 @@ export const spawnSign = (doorIdx, floorIdx) => {
 export const spawnPlate = (floorIdx) => {
   
   let entity = new ElevatorPlate.Entity(sceneContext, groups.sample1, {
-    x: 500,
+    x: DOOR_OFFSET + 173,
     y: floorPositions[floorIdx].y + 10,
     depth: 1
   });
@@ -182,7 +184,7 @@ export const spawnPlate = (floorIdx) => {
 export const spawnDoor = (doorIdx, floorIdx) => {
   
   let entity = new ElevatorDoor.Entity(sceneContext, groups.sample1, {
-    x: 350 + (doorIdx * 300),
+    x: DOOR_OFFSET + (doorIdx * DOOR_SPACING),
     y: floorPositions[floorIdx].y + 15,
     depth: 1
   });
@@ -202,7 +204,7 @@ export const spawnElevator = (doorIdx, floorIdx) => {
   
   let entity = new Elevator.Entity(sceneContext, groups.sample1, {
     id: `elevator_${doorIdx}`,
-    x: 351 + (doorIdx * 300),
+    x: DOOR_OFFSET + (doorIdx * DOOR_SPACING),
     y: pos.y + 18,
     depth: 0,
     floorHeights: floorPositions.map(fp => fp.y + 15)
