@@ -3,17 +3,24 @@ import Sample from './entities/sample.js';
 import ElevatorDoor from './entities/elevator-door.js';
 import ElevatorSign from './entities/elevator-sign.js';
 import ElevatorPlate from './entities/elevator-plate.js';
+import ControlPanel from './entities/control-panel.js';
 import Elevator from './entities/elevator.js';
 import { getDepthOfLayer } from './utils/values';
-import elevatorSign from './entities/elevator-sign.js';
+import { getElevatorQueue, resolveCommands } from './utils/elevator-boss.js';
 
 const groups = {};
 const elevators = [];
+const plates = [];
+const signs = [];
+const doors = [];
+const controlPanels = [];
 let commandQueue = [];
 let sceneContext;
 let floorPositions = [];
 const DOOR_OFFSET = 295;
 const DOOR_SPACING = 357;
+
+global.elevators = elevators;
 
 export const setContext = (context) => {
   sceneContext = context;
@@ -24,6 +31,7 @@ export const preload = () => {
   ElevatorDoor.initSpritesheet(sceneContext);
   ElevatorSign.initSpritesheet(sceneContext);
   ElevatorPlate.initSpritesheet(sceneContext);
+  ControlPanel.initSpritesheet(sceneContext);
   Elevator.initSpritesheet(sceneContext);
 }
 
@@ -36,97 +44,45 @@ export const create = (platformPos, eData, pData) => {
   ElevatorDoor.initSprites(sceneContext);
   ElevatorSign.initSprites(sceneContext);
   ElevatorPlate.initSprites(sceneContext);
+  ControlPanel.initSprites(sceneContext);
   Elevator.initSprites(sceneContext);
-
 
   spawnDoors(floorPositions);
   spawnPlates(floorPositions);
+  spawnControlPanels();
   spawnSigns(floorPositions);
   spawnElevators();
 
   return groups;
 }
 
+export const elevatorStateUpdate = () => {
+  // console.log('----------------------')
+  const eQueue = getElevatorQueue();
+
+  //- update elevator commands
+  elevators.forEach(elevator => {
+    elevator.checkNewUpdate();
+  });
+
+  //- light up plates
+  plates.forEach(p => {
+    p.setEStatus(eQueue.filter(eQ => eQ.floorIdx === p.floorIdx));
+  });
+}
+
 export const update = () => {
+  elevatorStateUpdate();
+
   groups.sample1.children.each(entity => {
     entity.update();
   });
 
-  //- check elevator1
-  //- at floor...
-  ///- for each command...
-  ////- does ele other have it?
-  ////- 
-
-  //- check elevator2
-
-
-  /*
-    first elevator: is it going that way already? if so
-
-  */
-
   global.commandQueue = commandQueue;
-
-  let freeElevators = [];
-  elevators.forEach(elevator => {
-    const atFloor = elevator.updateWithPosition();
-    if(atFloor){
-      clearFloorCommands(elevator.curFloor);
-      freeElevators.push(elevator);
-    }
-  });
-
-  const nextCommand = getNextFreeCommand();
-  if(nextCommand){
-    let closestElevator = null;
-    
-    console.log('freeElevators is ', freeElevators.length)
-    freeElevators.forEach(elevator => {
-      if(!closestElevator) {
-        closestElevator = elevator;
-      }else if(Math.abs(nextCommand.floorIdx - elevator.curFloor) < Math.abs(nextCommand.floorIdx - closestElevator.curFloor)){
-        console.log('closest assigned to ', elevator.id)
-        closestElevator = elevator;
-      }
-    });
-  
-    if(closestElevator){
-      console.log('closestElevator is ', closestElevator.id)
-      nextCommand.status = 'busy';
-      closestElevator.goToFloor(nextCommand);
-    }
-  
-    //- each elevator finds next available entry in queue
-
-  }
 }
 
-const clearFloorCommands = (floorIdx) => {
-  commandQueue = commandQueue.filter(c => c.floorIdx !== floorIdx);
-}
-
-
-const getNextFreeCommand = () => {
-  const command = commandQueue.find(c => c.status === 'free');
-  if(command){
-    return command;
-  }else{
-    return null;
-  }
-}
-
-const getNextCommand = (floorIdx) => {
-  const command = commandQueue.find(c => (c.status === 'free' && c.floorIdx !== floorIdx));
-  if(command){
-    return command;
-  }else{
-    return null;
-  }
-}
 
 export const spawnThis = (EntityRef, layerIdx) => {
-  // const pos = { x: 0, y : 0 }
   const pos = floorPositions[layerIdx];
   
   let entity = new EntityRef(sceneContext, groups.sample1, {
@@ -138,25 +94,47 @@ export const spawnThis = (EntityRef, layerIdx) => {
   return entity;
 }
 
+const onElevatorButton = (elevatorIdx, floorIdx) => {
+  elevators[elevatorIdx].addStop(floorIdx);
+}
+
+const spawnControlPanels = () => {
+  controlPanels.push(spawnControlPanel(0, 165, 75));
+  controlPanels.push(spawnControlPanel(1, 785, 75));
+}
+
 
 const spawnPlates = fPs => {
   fPs.forEach((fp, idx) => {
-    spawnPlate(idx);
+    plates.push(spawnPlate(idx));
   });
 }
 
 const spawnSigns = fPs => {
   fPs.forEach((fp, idx) => {
-    spawnSign(0, idx);
-    spawnSign(1, idx);
+    signs.push([ spawnSign(0, idx), spawnSign(1, idx) ]);
   });
 }
 
 const spawnDoors = fPs => {
   fPs.forEach((fp, idx) => {
-    spawnDoor(0, idx);
-    spawnDoor(1, idx);
+    doors.push([
+      spawnDoor(0, idx),
+      spawnDoor(1, idx)
+    ]);
   });
+}
+
+export const spawnControlPanel = (elevatorIdx, x, y) => {
+  
+  let entity = new ControlPanel.Entity(sceneContext, null, {
+    x: x,
+    y: y,
+    depth: 100,
+    elevatorIdx: elevatorIdx
+  }, onElevatorButton);
+
+  return entity;
 }
 
 export const spawnSign = (doorIdx, floorIdx) => {
@@ -175,7 +153,8 @@ export const spawnPlate = (floorIdx) => {
   let entity = new ElevatorPlate.Entity(sceneContext, groups.sample1, {
     x: DOOR_OFFSET + 173,
     y: floorPositions[floorIdx].y + 10,
-    depth: 1
+    depth: 1,
+    floorIdx: floorIdx
   });
 
   return entity;
@@ -186,7 +165,8 @@ export const spawnDoor = (doorIdx, floorIdx) => {
   let entity = new ElevatorDoor.Entity(sceneContext, groups.sample1, {
     x: DOOR_OFFSET + (doorIdx * DOOR_SPACING),
     y: floorPositions[floorIdx].y + 15,
-    depth: 1
+    depth: 1,
+    id: (floorIdx * 2) + doorIdx //- just a way to id them in order
   });
 
   return entity;
@@ -201,20 +181,34 @@ const spawnElevators = () => {
 
 export const spawnElevator = (doorIdx, floorIdx) => {
   const pos = floorPositions[floorIdx];
-  
   let entity = new Elevator.Entity(sceneContext, groups.sample1, {
-    id: `elevator_${doorIdx}`,
+    id: doorIdx,
     x: DOOR_OFFSET + (doorIdx * DOOR_SPACING),
     y: pos.y + 18,
     depth: 0,
     floorHeights: floorPositions.map(fp => fp.y + 15)
-  }, onIdle);
+  }, onElevator);
 
   return entity;
 }
 
-const onIdle = elevatorId => {
- console.log('onIdle', elevatorId) 
+const onElevator = (command, payload) => {
+  // console.log('onElevator', command, payload);
+
+  if(command === 'arrived'){
+    controlPanels[payload.elevatorIdx].clearButton(payload.floorIdx);
+    doors[payload.floorIdx][payload.elevatorIdx].open();
+  }else if (command === 'leaving'){
+    doors[payload.floorIdx][payload.elevatorIdx].close();
+  }else if (command === 'updateFloor'){
+    updateSigns(payload);
+  }
+}
+
+const updateSigns = (payload) => {
+  signs.forEach(floorSet => {
+    floorSet[payload.elevatorIdx].notifyElevatorState(payload);
+  })
 }
 
 const queueElevator = (floorIdx, direction) => {

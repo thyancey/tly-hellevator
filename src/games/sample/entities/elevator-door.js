@@ -12,7 +12,7 @@ export const STATUS = {
 const animationStatus = {
   [STATUS.CLOSED]: 'elevatorDoor_closed',
   [STATUS.OPENING]: 'elevatorDoor_opening',
-  [STATUS.CLOSING]: 'elevatorDoor_opening',
+  [STATUS.CLOSING]: 'elevatorDoor_closing',
   [STATUS.OPEN]: 'elevatorDoor_open'
 }
 
@@ -21,30 +21,29 @@ class Entity extends Phaser.Physics.Arcade.Sprite {
     super(scene, spawnData.x, spawnData.y, 'elevatorDoor');
     // this.isAlive = true;
 
+    this.id = spawnData.id;
+
     //- parent stuff
     scene.add.existing(this);
     if(!isNaN(spawnData.depth)) {
       this.setDepth(spawnData.depth);
     }
-    // if(physicsGroup){
-    //   physicsGroup.add(this);
-    // }else{
-    //   scene.physics.add.existing(this);
-    // }
 
-    //- physics
-    // this.setBounce(.4);
-    // this.setCollideWorldBounds(true);
-    // this.allowGravity = false;
-    
-    // this.body.setSize(36,15);
-    // this.body.offset.y = -2;
-    this.alpha = .5;
+    this.alpha = 1;
 
     this.setStatus(STATUS.CLOSED, true);
   }
 
   update(){
+  }
+
+  open(){
+    // console.log(`door ${this.id} is opening`);
+    this.setStatus(STATUS.OPENING);
+  }
+  close(){
+    // console.log(`door ${this.id} is closing`);
+    this.setStatus(STATUS.CLOSING);
   }
 
   setStatus(status, force){
@@ -79,7 +78,13 @@ const initSprites = (sceneContext) => {
   sceneContext.anims.create({
     key: 'elevatorDoor_opening',
     frames: sceneContext.anims.generateFrameNumbers('elevatorDoor', { start: 0, end: 2 }),
-    frameRate: 5,
+    frameRate: 3,
+    repeat: 0
+  });
+  sceneContext.anims.create({
+    key: 'elevatorDoor_closing',
+    frames: sceneContext.anims.generateFrameNumbers('elevatorDoor', { start: 0, end: 2 }).reverse(),
+    frameRate: 3,
     repeat: 0
   });
   sceneContext.anims.create({

@@ -20,8 +20,8 @@ class Entity extends Phaser.Physics.Arcade.Sprite {
     super(scene, spawnData.x, spawnData.y, 'elevatorSign');
     // this.isAlive = true;
 
-    this.sFloorIdx = 3;
-    this.sDirection = DIRECTION.DOWN;
+    this.sFloorIdx = 0;
+    this.sDirection = DIRECTION.UP;
     this.sOrientation = ORIENTATION.TOWARDS;
 
     //- parent stuff
@@ -29,24 +29,25 @@ class Entity extends Phaser.Physics.Arcade.Sprite {
     if(!isNaN(spawnData.depth)) {
       this.setDepth(spawnData.depth);
     }
-    // if(physicsGroup){
-    //   physicsGroup.add(this);
-    // }else{
-    //   scene.physics.add.existing(this);
-    // }
-
-    //- physics
-    // this.setBounce(.4);
-    // this.setCollideWorldBounds(true);
-    // this.allowGravity = false;
-    
-    // this.body.setSize(36,15);
-    // this.body.offset.y = -2;
 
     this.setStatus(STATUS.IDLE, true);
   }
 
   update(){
+  }
+
+  notifyElevatorState(payload){
+    // console.log('sign: setFloor', payload.floorIdx);
+    this.sFloorIdx = payload.floorIdx;
+    this.sDirection = payload.direction || this.sDirection;
+    this.sOrientation = payload.orientation || this.sOrientation;
+
+    this.renderSign();
+  }
+
+  renderSign(){
+    const anim = `eSign_p${this.sFloorIdx}_${this.sDirection}_${this.sOrientation}`
+    this.anims.play(anim);
   }
 
   setStatus(status, force){
@@ -59,11 +60,13 @@ class Entity extends Phaser.Physics.Arcade.Sprite {
       }
       */
 
-      const animKey = `eSign_p${this.sFloorIdx}_${this.sDirection}_${this.sOrientation}`;
-      if(animKey){
-        // console.log('playing ', animKey);
-        this.anims.play(animKey);
-      }
+      this.renderSign();
+
+      // const animKey = `eSign_p${this.sFloorIdx}_${this.sDirection}_${this.sOrientation}`;
+      // if(animKey){
+      //   // console.log('playing ', animKey);
+      //   this.anims.play(animKey);
+      // }
     }
   }
 }

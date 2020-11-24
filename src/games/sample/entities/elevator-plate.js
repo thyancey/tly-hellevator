@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
 import img_elevatorPlate from '../assets/elevator-plate.png';
+import { spawnDoor } from '../spawn';
 
 export const STATUS = {
   NEITHER: 0,
@@ -20,6 +21,7 @@ class Entity extends Phaser.Physics.Arcade.Sprite {
     constructor (scene, physicsGroup, spawnData) {
     super(scene, spawnData.x, spawnData.y, 'elevatorPlate');
     // this.isAlive = true;
+    this.floorIdx = spawnData.floorIdx;
 
     //- parent stuff
     scene.add.existing(this);
@@ -35,8 +37,23 @@ class Entity extends Phaser.Physics.Arcade.Sprite {
   update(){
   }
 
+  setEStatus(queue){
+    if(queue.length === 0){
+      this.setStatus(STATUS.NEITHER);
+    }else if(queue.length === 1){
+      if(queue[0].direction === 'up'){
+        this.setStatus(STATUS.UP);
+      }else{
+        this.setStatus(STATUS.DOWN);
+      }
+    }else{
+      this.setStatus(STATUS.BOTH);
+    }
+  }
+
   setStatus(status, force){
     if(force || this.status !== status){
+      console.log(`setting plate ${this.floorIdx} to ${status}`);
       this.status = status;
 
       /*

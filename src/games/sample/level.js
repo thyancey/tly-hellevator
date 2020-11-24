@@ -1,4 +1,4 @@
-import img_sample_bg from './assets/sample-bg.png';
+import img_sample_bg from './assets/background.png';
 import img_bar_white from './assets/bar-white.png';
 
 import Values from './utils/values';
