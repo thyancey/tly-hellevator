@@ -1,0 +1,160 @@
+
+
+
+Elevator pseudo
+
+*status states
+busy
+idle
+
+*animation states
+closed [b,i]
+opening [i]
+open [i]
+closing [b,i]
+(can be closing before preparing to move)
+
+loop
+- check buttons
+> track state, update buttons each cycle?
+
+for each button, check requests
+  floor, direction, order pressed
+  [
+    {
+      id: 12345678910, (timestamp)
+      floor: 2,
+      direction: down,
+      forElevator: 0 //changes often?
+    }
+  ]
+
+
+getElevatorsMovingDown()
+ // assign to slot
+
+getElevatorsMovingUp()
+
+
+getFreeElevators()
+// asign to slot?
+
+- check elevator states, sort queue by priority
+for each
+  check state & destination
+  "am i moving? am I at my destination yet? should i have a new destination?"
+  getNextDestination()
+    if moving...
+      get closest requests with matching direction and orientation
+        - same direction
+        - proximity
+        - alt direction
+      [ 123456, 34567 ]
+
+      [ 34567 ]
+    if still...
+      get all requests
+      [ 123456, 23456, 34567]
+
+
+  return
+  [
+    {
+      idx: 0,
+      floor: 0,
+      status: moving
+    },
+    {
+      id: 1,
+      floor: 2,
+      status: idle
+    }
+  ]
+
+
+THEN, consider each elevators queue by status
+- moving ones pick first?
+  [
+    12345,
+    34567,
+    54345
+  ]
+
+- assign elevator states
+for each elevator
+  assign target
+
+
+as elevator is moving...
+"are there any floors in the direction im going on the way?"
+reassign "movingTo" per update?
+
+
+
+
+
+buttonQueue: [
+  {
+    id: 12345678910, (timestamp)
+    floorIdx: 2,
+    direction: 'up'
+  }
+]
+
+elevator.movingTo = buttonQueue
+
+
+
+
+BUTTON
+- on button click, add to queue
+- on queue removal, update status
+
+every update()
+1. manage button status
+
+2. get sorted button queue for each elevator
+
+3. manage priority, with a single (or null) command for each elevator
+
+4. assign command to elevator
+
+5. update elevator states
+
+ELEVATOR
+- on arrived, callback to remove queue command
+
+
+
+
+
+
+on 4, going down
+[
+  {id: 1606160242977, floorIdx: 3, direction: "down", floorDiff: 1, priority: true}
+  {id: 1606160242977, floorIdx: 2, direction: "down", floorDiff: 2, priority: true}
+  {id: 1606160242977, floorIdx: 1, direction: "down", floorDiff: 3, priority: true}
+  {id: 1606160242977, floorIdx: 2, direction: "up", floorDiff: 2, priority: false}
+]
+
+on 1, going up
+[
+  {id: 1606160242977, floorIdx: 2, direction: "up", floorDiff: 1, priority: true}
+]
+
+
+
+on 4, going down
+[
+  {id: 1606160242977, floorIdx: 2, direction: "down", floorDiff: 2, priority: true}
+  {id: 1606160242977, floorIdx: 1, direction: "down", floorDiff: 3, priority: true}
+  {id: 1606160242977, floorIdx: 2, direction: "up", floorDiff: 2, priority: false}
+]
+
+
+on 3, going down
+[
+  {id: 1606160242977, floorIdx: 2, direction: "down", floorDiff: 1, priority: true}
+  {id: 1606160242977, floorIdx: 1, direction: "down", floorDiff: 2, priority: true}
+  {id: 1606160242977, floorIdx: 2, direction: "up", floorDiff: 1, priority: false}
+]
